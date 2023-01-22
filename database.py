@@ -34,13 +34,8 @@ UPDATE_CUSTOMER = """ UPDATE customers SET
                       WHERE id = ?"""
 
 GET_CUSTOMERS_BY_ANY = """
-        SELECT * FROM customers WHERE customer_id LIKE ?
-         OR name LIKE ?
-         OR surname LIKE ?
-         OR email LIKE ?
-         OR phone_number LIKE ?
-         OR address LIKE ?
-         ;"""
+        SELECT * FROM customers WHERE
+            customer_id || name || surname || email || phone_number || address LIKE ?;"""
 
 
 def connect():
@@ -64,9 +59,7 @@ def get_all_customers(connection):
 
 def get_customers_by_any(connection, searchstr):
     with connection:
-        return connection.execute(GET_CUSTOMERS_BY_ANY,
-                                  ('%' + searchstr + '%', '%' + searchstr + '%', '%' + searchstr + '%',
-                                   '%' + searchstr + '%', '%' + searchstr + '%', '%' + searchstr + '%')).fetchall()
+        return connection.execute(GET_CUSTOMERS_BY_ANY, ('%' + searchstr + '%',)).fetchall()
 
 
 def delete_customer(connection, id):
