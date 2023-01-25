@@ -1,9 +1,10 @@
 import sys
 import database
 import qdarkstyle
-from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
+from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QFileDialog
 from PySide6 import QtCore
 from ui_mainwindow import Ui_MainWindow
+from pathlib import Path
 
 
 class MainPage(QMainWindow, Ui_MainWindow):
@@ -11,6 +12,7 @@ class MainPage(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.EDIT_MODE = 0  # 0 = New record 1 = Update Record
         self.idx = 0
+        self.path = ""
         self.setupUi(self)
         self.setWindowTitle("Customer Database")
         self.saveBtn.setDisabled(True)
@@ -23,6 +25,7 @@ class MainPage(QMainWindow, Ui_MainWindow):
         self.searchBtn.clicked.connect(self.searchCustomer)
         self.tableWidget.itemDoubleClicked.connect(self.takeRecord)
         self.clearFilterBtn.clicked.connect(self.listCustomers)
+        self.browseBtn.clicked.connect(self.browse_photo)
         self.deleteSelectedRecordBtn.clicked.connect(self.deleteCustomer)
         self.tableWidget.selectionModel().selectionChanged.connect(
             self.onSelectionChanged)
@@ -34,16 +37,31 @@ class MainPage(QMainWindow, Ui_MainWindow):
         self.deleteSelectedRecordBtn.setEnabled(
             bool(self.tableWidget.selectionModel().selectedRows())
         )
+    
+    def browse_photo(self):
+#         
+        filename, ok = QFileDialog.getOpenFileName(
+            self,
+            "Select a Photo", 
+            "photos/", 
+            "Images (*.png *.jpg)")
+        if filename:
+            self.path = str(Path(filename)).replace("\\", "/")
+            self.photoFrame.setStyleSheet(f"border-image: url('{self.path}');")
+           
+                
     def deleteCustomer(self):
         self.tableWidget.showColumn(0)
         selected_record = self.tableWidget.selectedItems()[0].text()
         database.delete_customer(database.connect(), (selected_record,))
         self.tableWidget.hideColumn(0)
+        self.clearLines()
         self.listCustomers()
 
     def takeRecord(self):
         self.clearLines()
         self.tableWidget.showColumn(0)
+        self.tableWidget.showColumn(7)
         self.current_rows = []
         for idx in self.tableWidget.selectedIndexes():
             self.current_rows.append(str(self.tableWidget.item(self.tableWidget.currentRow(), idx.column()).text()))
@@ -54,7 +72,11 @@ class MainPage(QMainWindow, Ui_MainWindow):
         self.phoneNumberLineEdit.setText(self.current_rows[4])
         self.emailLineEdit.setText(self.current_rows[5])
         self.addressTextEdit.setText(self.current_rows[6])
+        photo = self.current_rows[7]
+        photo = photo.replace("\\", "/")
+        self.photoFrame.setStyleSheet(f"border-image: url('{photo}');")
         self.tableWidget.hideColumn(0)
+        self.tableWidget.hideColumn(7)
         self.EDIT_MODE = 1
         self.saveBtn.setText("Update")
 
@@ -81,10 +103,12 @@ class MainPage(QMainWindow, Ui_MainWindow):
         address = self.addressTextEdit.toPlainText()
         email = self.emailLineEdit.text()
         phoneNumber = self.phoneNumberLineEdit.text()
+        photo_path = str(self.path)
         if self.EDIT_MODE == 0:
-            database.add_customers(connection, customerId, name, surname, phoneNumber, email, address)
+            database.add_customers(connection, customerId, name, surname, phoneNumber, email, address, photo_path)
         elif self.EDIT_MODE == 1:
-            database.update_customer(connection, customerId, name, surname, phoneNumber, email, address, self.idx)
+            database.update_customer(connection, customerId, name, surname, phoneNumber, email,
+             address, photo_path, self.idx)
         self.listCustomers()
         self.clearLines()
 
@@ -97,6 +121,8 @@ class MainPage(QMainWindow, Ui_MainWindow):
         self.addressTextEdit.setText('')
         self.emailLineEdit.setText('')
         self.phoneNumberLineEdit.setText('')
+        self.photoFrame.setStyleSheet("border-image : None;")
+        self.path = ""
 
     def listCustomers(self):
         self.searchFoundTotalLabel.setText('')

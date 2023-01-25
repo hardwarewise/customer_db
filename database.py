@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS customers (
                             surname TEXT,
                             phone_number TEXT,
                             email TEXT,
-                            address TEXT
+                            address TEXT,
+                            photo_path TEXT
                             );"""
 
 INSERT_CUSTOMERS = """ 
@@ -18,8 +19,9 @@ INSERT INTO customers (
             surname,
             phone_number,
             email,
-            address
-            ) VALUES ( ?, ?, ?, ?, ?, ?);
+            address,
+            photo_path
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?);
             """
 
 GET_ALL_CUSTOMERS = """SELECT * FROM customers;"""
@@ -30,7 +32,8 @@ UPDATE_CUSTOMER = """ UPDATE customers SET
                       customer_id = ?,
                       name = ?, surname = ?,
                       phone_number = ?, email = ?,
-                      address = ?
+                      address = ?,
+                      photo_path = ?
                       WHERE id = ?"""
 
 GET_CUSTOMERS_BY_ANY = """
@@ -47,9 +50,9 @@ def create_tables(connection):
         connection.execute(CREATE_CUSTOMERS_TABLE)
 
 
-def add_customers(connection, customer_id, name, surname, phone_number, email, address):
+def add_customers(connection, customer_id, name, surname, phone_number, email, address, photo_path):
     with connection:
-        connection.execute(INSERT_CUSTOMERS, (customer_id, name, surname, phone_number, email, address))
+        connection.execute(INSERT_CUSTOMERS, (customer_id, name, surname, phone_number, email, address, photo_path))
 
 
 def get_all_customers(connection):
@@ -67,6 +70,7 @@ def delete_customer(connection, id):
         return connection.execute(DELETE_CUSTOMER, id)
 
 
-def update_customer(connection, customer_id, name, surname, phone_number, email, address, id):
+def update_customer(connection, customer_id, name, surname, phone_number, email, address, photo_path, id):
     with connection:
-        connection.execute(UPDATE_CUSTOMER, (customer_id, name, surname, phone_number, email, address, id))
+        connection.execute(UPDATE_CUSTOMER, (customer_id, name, surname,
+         phone_number, email, address, photo_path, id))

@@ -1,1 +1,4 @@
 data.db
+.idea
+/__pycache__/
+**/photos/
