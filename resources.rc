@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/icons">
+    <file alias = "database">icons/database.png</file>
+    <file alias = "clear">icons/clear.png</file>
+    <file alias = "reset">icons/reset.png</file>
+    <file alias = "save">icons/save.png</file>
+    <file alias = "browse">icons/browse.png</file>
+    <file alias = "search">icons/search.png</file>
+    <file alias = "delete">icons/delete.png</file>
+</qresource>
+</RCC>

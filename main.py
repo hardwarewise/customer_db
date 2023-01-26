@@ -2,9 +2,11 @@ import sys
 import database
 import qdarkstyle
 from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QFileDialog
-from PySide6 import QtCore
+from PySide6 import QtCore, QtGui
+from PySide6.QtGui import QIcon, QPixmap
 from ui_mainwindow import Ui_MainWindow
 from pathlib import Path
+import rc_resources
 
 
 class MainPage(QMainWindow, Ui_MainWindow):
@@ -15,6 +17,23 @@ class MainPage(QMainWindow, Ui_MainWindow):
         self.path = ""
         self.setupUi(self)
         self.setWindowTitle("Customer Database")
+        
+        appIcon = QIcon(QPixmap(":/icons/database"))
+        self.setWindowIcon(appIcon)
+        searcIcon = QIcon(QPixmap(":/icons/search"))
+        self.searchBtn.setIcon(searcIcon)
+        browseIcon = QIcon(QPixmap(":/icons/browse"))
+        self.browseBtn.setIcon(browseIcon)
+        clearIcon = QIcon(QPixmap(":/icons/clear"))
+        self.clearFilterBtn.setIcon(clearIcon)
+        resetIcon = QIcon(QPixmap(":/icons/reset"))
+        self.resetBtn.setIcon(resetIcon)
+        saveIcon = QIcon(QPixmap(":/icons/save"))
+        self.saveBtn.setIcon(saveIcon)
+        deleteIcon = QIcon(QPixmap(":/icons/delete"))
+        self.deleteSelectedRecordBtn.setIcon(deleteIcon)
+        
+        
         self.saveBtn.setDisabled(True)
         self.deleteSelectedRecordBtn.setDisabled(True)
         self.tableWidget.itemClicked.connect(lambda: self.deleteSelectedRecordBtn.setDisabled(False))
@@ -133,6 +152,7 @@ class MainPage(QMainWindow, Ui_MainWindow):
             for colIndex, colData in enumerate(rowData):
                 self.tableWidget.setItem(rowIndex, colIndex, QTableWidgetItem(str(colData)))
         self.tableWidget.hideColumn(0)
+        self.tableWidget.hideColumn(7)
 
 
 if __name__ == '__main__':
